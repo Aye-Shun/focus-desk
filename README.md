@@ -1,12 +1,12 @@
 # Focus Desk
 
-A small **React + Vite** focus timer with a calm interface, short and long breaks, and a completed-session counter saved in your browser. A beginner-sized frontend project with real timer state, responsive styling, and tests.
+A small React timer with 25-minute focus sessions, 5-minute short breaks, and 15-minute long breaks. The completed focus-session count is saved in the browser.
 
-![Focus Desk interface](docs/preview.png)
+![Focus Desk](docs/preview.png)
 
-## Run locally
+## Run it
 
-Requires **Node.js 22.12 or newer** and npm.
+Use Node.js 22.12 or newer.
 
 ```bash
 git clone https://github.com/Aye-Shun/focus-desk.git
@@ -15,25 +15,11 @@ npm ci
 npm run dev
 ```
 
-Open the local address printed by Vite, usually `http://127.0.0.1:5173`.
+Open the address Vite prints. Pick a mode and press Start. Pause keeps the remaining time; Reset returns that mode to its full duration without clearing the count. Switching modes clears the current timer. After a session finishes, choose the next mode and start it when ready. Breaks do not add to the focus-session count.
 
-## Features
+## How the timer works
 
-- 25-minute focus sessions, 5-minute short breaks, and 15-minute long breaks.
-- Start, pause, resume, and reset controls.
-- A progress ring and remaining time in the browser tab title.
-- Completed focus-session count saved in `localStorage` when available.
-- Responsive layouts, keyboard-accessible controls, and reduced-motion styling.
-
-When a session finishes, choose the next mode and start it when ready. Changing modes cancels the current timer. Reset returns the selected mode to its full duration; it keeps the completed-session count. Breaks do not count as focus sessions.
-
-## Timer design
-
-`src/timer.js` keeps timer transitions in a pure reducer. Running sessions use an absolute deadline, so delayed browser callbacks do not turn into accumulated countdown drift. Pausing keeps the remaining milliseconds; the display rounds up to whole seconds. Completion can add to the session count only once.
-
-`src/main.jsx` connects the reducer to the controls, periodic ticks, browser visibility changes, and storage. `src/style.css` handles the layout without a component library or external fonts.
-
-## Tests and production build
+`src/timer.js` handles the state changes in a reducer. A running timer stores a deadline instead of subtracting one second on each callback, so delayed callbacks do not accumulate countdown drift. `src/main.jsx` sends ticks and connects the controls and browser storage. The remaining time also appears in the tab title while running.
 
 ```bash
 npm test
@@ -41,16 +27,12 @@ npm run build
 npm run preview
 ```
 
-The tests exercise delayed callbacks, exact pause/resume timing, once-only completion, break counting, mode changes, and display rounding. GitHub Actions tests and builds on Node.js 22 and 24. The build writes static files to `dist/`.
+The tests cover delayed ticks, pause/resume timing, counting a completion once, breaks, mode changes, and display rounding. The build creates static files in `dist/`; preview serves that build locally.
 
-## Scope
+## Limits
 
-This is a single-tab learning app. Refreshing or closing the page resets the active timer; only the completed-session count is saved. Multiple tabs can overwrite that count, so use one tab at a time. Clearing site data removes the count. If storage is blocked, the app shows that sessions will last only for the current visit.
+Refreshing or closing the page resets the active timer. Only the completed count is saved. Use one tab at a time: tabs can overwrite each other's count, and the last write wins. There is no browser or account sync. Clearing site data removes the count; blocked storage keeps it only for the current visit.
 
-There are no accounts, notifications, sound alerts, cloud sync, task lists, or configurable durations. A sleeping or suspended browser displays the elapsed result when execution resumes. Since deadlines use the system clock, changing that clock can affect a running timer.
-
-Possible extensions: custom durations, session history, and optional completion notifications.
-
-## License
+There are no sound alerts or notifications. A suspended browser updates the timer when it resumes. Changing the system clock can affect a running timer.
 
 MIT — see [LICENSE](LICENSE).

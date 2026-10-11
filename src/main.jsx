@@ -35,25 +35,17 @@ function App() {
   }, [timer.remaining, isRunning]);
 
   return <main className="workspace">
-    <header className="header"><a className="brand" href="./"><span className="brand-icon">◈</span> Focus Desk</a><span className="header-note">A little space to get things done.</span></header>
-    <section className="intro"><p className="eyebrow">YOUR NEXT 25 MINUTES</p><h1>Find your focus.</h1><p>Pick a task, start a session, and take a proper break.</p></section>
-    <div className="grid">
-      <section className="timer-card" aria-label="Focus timer">
-        <div className="modes" aria-label="Timer mode">{Object.entries(MODES).map(([key, value]) =>
-          <button key={key} className={timer.mode === key ? 'selected' : ''} aria-pressed={timer.mode === key} onClick={() => dispatch({ type: 'mode', mode: key })}>{value.label}</button>)}</div>
-        <div className="dial">
-          <svg viewBox="0 0 260 260" aria-hidden="true"><circle className="track" cx="130" cy="130" r="118"/><circle className="progress" cx="130" cy="130" r="118" strokeDasharray="741.42" strokeDashoffset={741.42 * (1 - progress)}/></svg>
-          <div className="dial-text"><p className="timer-status">{isFinished ? 'SESSION COMPLETE' : isRunning ? 'IN PROGRESS' : timer.status === 'paused' ? 'PAUSED' : 'READY WHEN YOU ARE'}</p><p className="time" role="timer" aria-label={`${mode.label} time remaining`}>{formatTime(timer.remaining)}</p><p className="timer-hint">{isFinished ? 'A small win. Keep the rhythm.' : mode.hint}</p></div>
-        </div>
-        <p className="completion" role="status">{isFinished ? (timer.mode === 'focus' ? 'Focus session saved. Time for a break.' : 'Break complete. Ready for your next task?') : ''}</p>
-        <div className="controls"><button className="primary" onClick={() => dispatch(isFinished ? { type: 'mode', mode: nextMode } : { type: isRunning ? 'pause' : 'start', now: Date.now() })}>{isFinished ? `Next: ${MODES[nextMode].label.toLowerCase()}` : isRunning ? 'Pause session' : timer.status === 'paused' ? 'Resume session' : 'Start session'}</button><button className="reset" onClick={() => dispatch({ type: 'reset' })}>Reset</button></div>
-      </section>
-      <aside className="side">
-        <section className="session-card"><span className="small-label">YOUR MOMENTUM</span><p className="session-count">{timer.completed}<span>sessions</span></p><p>Completed focus sessions</p><div className="storage-note"><span className="dot"/> {storageAvailable ? 'Saved on this browser' : 'Storage unavailable — this visit only'}</div></section>
-        <section className="routine-card"><span className="small-label">A SIMPLE RHYTHM</span><ol><li><span>01</span><div><strong>Choose one task</strong><p>Keep the next step small.</p></div></li><li><span>02</span><div><strong>Make some progress</strong><p>Give it 25 quiet minutes.</p></div></li><li><span>03</span><div><strong>Take a break</strong><p>Stretch, refill, reset.</p></div></li></ol></section>
-      </aside>
-    </div>
-    <footer>Built with React · No account needed · Your pace, your space</footer>
+    <header className="page-heading"><h1>Focus Desk</h1><p>A focus timer with short and long breaks.</p></header>
+    <section className="timer" aria-label="Focus timer">
+      <div className="modes" role="group" aria-label="Timer mode">{Object.entries(MODES).map(([key, value]) =>
+        <button key={key} className={timer.mode === key ? 'selected' : ''} aria-pressed={timer.mode === key} onClick={() => dispatch({ type: 'mode', mode: key })}>{value.label} ({value.minutes} min)</button>)}</div>
+      <div className="timer-display"><p className="time" role="timer" aria-label={`${mode.label} time remaining`}>{formatTime(timer.remaining)}</p><p className="timer-status">{isFinished ? 'Finished' : isRunning ? 'Running' : timer.status === 'paused' ? 'Paused' : 'Ready'}</p></div>
+      <progress className="session-progress" max="1" value={progress} aria-label={`${mode.label} progress`} />
+      <p className="completion" role="status">{isFinished ? (timer.mode === 'focus' ? 'Focus session complete.' : 'Break complete.') : ''}</p>
+      <div className="controls"><button onClick={() => dispatch(isFinished ? { type: 'mode', mode: nextMode } : { type: isRunning ? 'pause' : 'start', now: Date.now() })}>{isFinished ? `Choose ${MODES[nextMode].label.toLowerCase()}` : isRunning ? 'Pause' : timer.status === 'paused' ? 'Resume' : 'Start'}</button><button onClick={() => dispatch({ type: 'reset' })}>Reset</button></div>
+    </section>
+    <p className="timer-help">Switching modes clears the current timer. Reset keeps your session count.</p>
+    <section className="session-summary" aria-label="Completed sessions"><p>Completed focus sessions: <strong>{timer.completed}</strong></p><p className="storage-note">{storageAvailable ? 'Count saved in this browser.' : 'Storage unavailable. The count is kept only for this visit.'}</p></section>
   </main>;
 }
 
